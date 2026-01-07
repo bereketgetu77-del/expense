@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker - Track Your Money</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23667eea'/><text x='50' y='60' font-family='Arial' font-size='40' text-anchor='middle' fill='white'>💰</text></svg>">
+    <meta name="description" content="Free Expense Tracker - Track income and expenses easily. Simple, private, and 100% free.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text: #333;
+            --subtext: #666;
+            --input-bg: white;
+            --input-border: #e9ecef;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode {
+            --bg-gradient: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            --card-bg: rgba(30, 30, 46, 0.95);
+            --text: #f0f0f0;
+            --subtext: #aaa;
+            --input-bg: #2d2d44;
+            --input-border: #444;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text);
+            transition: background 0.5s;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .header h1 {
+            color: var(--text);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--subtext);
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        select {
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid var(--input-border);
+            background: var(--input-bg);
+            color: var(--text);
+        }
+
+        .dark-toggle {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body.dark-mode .dark-toggle {
+            background: #667eea;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .balance-amount {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .balance-label {
+            display: block;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .balance-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+        }
+
+        .balance-stats {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            display: block;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .income {
+            color: #28a745;
+        }
+
+        .expense {
+            color: #dc3545;
+        }
+
+        .add-transaction {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+        }
+
+        body.dark-mode .add-transaction {
+            background: #2a2a3a;
+        }
+
+        .add-transaction h3 {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--input-border);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            background: var(--input-bg);
+            color: var(--text);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .transactions-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .transactions-section h3 {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .transactions-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            background: white;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #4facfe;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .transaction-item {
+            background: #2a2a3a;
+        }
+
+        .transaction-item.income {
+            border-left-color: #28a745;
+        }
+
+        .transaction-item.expense {
+            border-left-color: #dc3545;
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-description {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .transaction-meta {
+            font-size: 0.8rem;
+            color: var(--subtext);
+        }
+
+        .transaction-amount {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .transaction-amount.income {
+            color: #28a745;
+        }
+
+        .transaction-amount.expense {
+            color: #dc3545;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--subtext);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .quick-stats {
+            margin-bottom: 1.5rem;
+        }
+
+        .quick-stats h3 {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .stat-card {
+            background: #2a2a3a;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .stat-icon.income {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+
+        .stat-icon.expense {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
+        .stat-title {
+            font-size: 0.8rem;
+            color: var(--subtext);
+            display: block;
+        }
+
+        .stat-amount {
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .ad-space {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        body.dark-mode .ad-space {
+            background: #444;
+            border-color: #666;
+            color: #f0f0f0;
+        }
+
+        .ad-space p {
+            margin-bottom: 0.5rem;
+            color: #856404;
+            font-size: 0.9rem;
+        }
+
+        body.dark-mode .ad-space p {
+            color: #f0c674;
+        }
+
+        .btn-secondary {
+            background: #ffc107;
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .footer-links {
+            text-align: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        body.dark-mode .footer-links {
+            border-top-color: #444;
+        }
+
+        .footer-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 0.9rem;
+        }
+
+        .small {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .nav-btn.active {
+            background: #667eea;
+        }
+
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .share-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            color: #fff;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        .share-btn i {
+            font-size: 18px;
+        }
+
+        .share-btn.telegram {
+            background-color: #0088cc;
+        }
+
+        .share-btn.whatsapp {
+            background-color: #25D366;
+        }
+
+        .share-btn.twitter {
+            background-color: #000;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+            opacity: 0.9;
+        }
+
+        .feedback-btn {
+            background: #6c63ff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .privacy-container {
+            max-width: 400px;
+            margin: 40px auto;
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            color: var(--text);
+        }
+
+        .privacy-container h1 {
+            text-align: center;
+            color: #4facfe;
+            margin-bottom: 1rem;
+        }
+
+        .privacy-container h2 {
+            color: var(--text);
+            margin-top: 1rem;
+        }
+
+        .privacy-container p, 
+        .privacy-container ul {
+            color: var(--subtext);
+            line-height: 1.6;
+        }
+
+        .privacy-container ul {
+            margin-left: 1.2rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        .back-btn i {
+            margin-right: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .balance-value {
+                font-size: 1.8rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div id="app-container" class="container">
+    <!-- Navigation -->
+    <div class="nav-buttons">
+        <button class="nav-btn active" onclick="showSection('app')">
+            <i class="fas fa-home"></i> App
+        </button>
+        <button class="nav-btn" onclick="showSection('privacy')">
+            <i class="fas fa-shield-alt"></i> Privacy
+        </button>
+        <button class="nav-btn" onclick="showSection('support')">
+           <i class="fas fa-headset"></i> Support
+        </button>
+        <button class="nav-btn" onclick="showSection('about')">
+            <i class="fas fa-info-circle"></i> About
+        </button>
+    </div>
+
+    <!-- Controls: Language + Dark Mode -->
+    <div class="controls">
+        <div class="control-group">
+            <select id="languageSelect" onchange="changeLanguage()">
+                <option value="en">English</option>
+                <option value="am">አማርኛ</option>
+            </select>
+        </div>
+        <button class="dark-toggle" onclick="toggleDarkMode()">
+            <i class="fas fa-moon"></i> Dark Mode
+        </button>
+    </div>
+
+    <!-- App Section (your original content unchanged) -->
+    <div id="app-section">
+        <header class="header">
+            <h1><i class="fas fa-wallet"></i> Expense Tracker</h1>
+            <p>Track your money, grow your wealth</p>
+        </header>
+
+        <div class="balance-card">
+            <div class="balance-amount">
+                <span class="balance-label">Current Balance</span>
+                <span class="balance-value" id="currentBalance">$0.00</span>
+            </div>
+            <div class="balance-stats">
+                <div class="stat">
+                    <span class="stat-label">Income</span>
+                    <span class="stat-value income" id="totalIncome">$0.00</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Expenses</span>
+                    <span class="stat-value expense" id="totalExpenses">$0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="add-transaction">
+            <h3>Add Transaction</h3>
+            <form id="transactionForm">
+                <div class="form-group">
+                    <input type="text" id="description" placeholder="Description" required>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="amount" placeholder="Amount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <input type="date" id="date" required>
+                </div>
+                <div class="form-group">
+                    <select id="type" required>
+                        <option value="">Select Type</option>
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select id="category">
+                        <option value="other">Other</option>
+                        <option value="food">Food</option>
+                        <option value="transport">Transport</option>
+                        <option value="shopping">Shopping</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="bills">Bills</option>
+                        <option value="salary">Salary</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-plus"></i> Add Transaction
+                </button>
+            </form>
+        </div>
+
+        <div class="transactions-section">
+            <h3>Recent Transactions</h3>
+            <div class="transactions-list" id="transactionsList">
+                <div class="empty-state">
+                    <i class="fas fa-receipt"></i>
+                    <p>No transactions yet</p>
+                    <p class="small">Add your first transaction above</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-stats">
+            <h3>This Month</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon income">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-title">Income</span>
+                        <span class="stat-amount" id="monthIncome">$0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon expense">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-title">Expenses</span>
+                        <span class="stat-amount" id="monthExpenses">$0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-space">
+            <p><strong>Version 1.0</strong> - Thank you for trying our app!</p>
+            <p class="small">We're constantly improving. Your feedback is welcome!</p>
+            <button class="btn-secondary" onclick="exportExcel()">
+                <i class="fas fa-file-excel"></i> Export Excel
+            </button>
+            <button class="btn-secondary" onclick="exportPDF()">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </button>
+            <div class="share-buttons">
+                <button class="share-btn telegram" onclick="shareSocial('telegram')">
+                    <i class="fa-brands fa-telegram"></i> Telegram
+                </button>
+                <button class="share-btn whatsapp" onclick="shareSocial('whatsapp')">
+                    <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                </button>
+                <button class="share-btn twitter" onclick="shareSocial('twitter')">
+                    <i class="fa-brands fa-x-twitter"></i> X (Twitter)
+                </button>
+            </div>
+
+            <button class="feedback-btn" onclick="sendFeedback()">Send Feedback</button>
+        </div>
+
+        <div class="footer-links">
+            <a href="https://bereketgetu77-del.github.io/Privacy-policy/">Privacy Policy</a>
+        </div>
+    </div>
+
+    <!-- Your original Privacy, Support, About sections (100% unchanged) -->
+    <div id="privacy-section" class="privacy-container" style="display:none;">
+        <button class="back-btn" onclick="showSection('app')">
+            <i class="fas fa-arrow-left"></i> Back to App
+        </button>
+        <h1>Privacy Policy</h1>
+        <p><strong>Last updated:</strong> <span class="currentDate"></span></p>
+        <h2>Data Collection</h2>
+        <p>All your financial data is stored locally. We do not collect any personal info.</p>
+        <h2>Data Usage</h2>
+        <p>Used only to provide tracking features.</p>
+        <h2>Contact</h2>
+        <p>Contact: <strong>bereketgetu77@gmail.com</strong></p>
+    </div>
+
+    <div id="support-section" class="privacy-container" style="display: none;">
+         <button class="back-btn" onclick="showSection('app')">
+        <i class="fas fa-arrow-left"></i> Back to App
+    </button>
+    <h1>Support</h1>
+    <p><strong>Last updated:</strong> <span class="currentDate"></span></p>
+
+    <h2>Need Help?</h2>
+    <p>If you experience any issues or have questions about Expense Tracker Pro, we're here to help.</p>
+
+    <h2>Contact Support</h2>
+    <p>You can reach our support team at <strong>bereketgetu77@gmail.com</strong>.  
+       We typically respond within 24 hours.</p>
+
+    <h2>Common Questions</h2>
+    <ul>
+        <li><strong>How do I export my data?</strong> → Use the Export Excel or Export PDF buttons.</li>
+        <li><strong>Is my data safe?</strong> → Yes! All your financial data stays private on your device or localStorage.</li>
+    </ul>
+    </div>
+
+    <div id="about-section" class="privacy-container" style="display: none;">
+        <button class="back-btn" onclick="showSection('app')">
+        <i class="fas fa-arrow-left"></i> Back to App
+    </button>
+    <h1>About Expense Tracker </h1>
+    <p><strong>Last updated:</strong> <span class="currentDate"></span></p>
+
+    <h2>Our Mission</h2>
+    <p>Expense Tracker helps you easily manage your income and expenses — 100% private and simple</p>
+
+    <h2>Developer</h2>
+    <p>Created by <strong>Bereket Getu</strong> — a young developer passionate about building smart and useful tools for everyone.</p>
+
+    <h2>Version Info</h2>
+    <p>Current Version: <strong>1.0</strong></p>
+    <p>Future updates will include <strong><ul>
+        <li>Other currency</li>
+        <li>Premium feature</li>
+        <li>Suprise feature and so on</li>
+    </ul>
+</strong>
+</p>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+    let currentCurrency = localStorage.getItem('currency') || '$';
+
+    // Set today's date
+    document.getElementById('date').value = new Date().toISOString().split('T')[0];
+
+    // Language translations
+    const translations = {
+        en: {
+            appTitle: "Expense Tracker",
+            subtitle: "Track your money, grow your wealth",
+            currentBalance: "Current Balance",
+            income: "Income",
+            expenses: "Expenses",
+            addTransaction: "Add Transaction",
+            recentTransactions: "Recent Transactions",
+            noTransactions: "No transactions yet",
+            addFirst: "Add your first transaction above",
+            thisMonth: "This Month"
+        },
+        am: {
+            appTitle: "የወጪ መከታተያ",
+            subtitle: "ገንዘብዎን ይከታተሉ፣ ሀብትዎን ያሳድጉ",
+            currentBalance: "የአሁኑ ቀሪ ሂሳብ",
+            income: "ገቢ",
+            expenses: "ወጪዎች",
+            addTransaction: "ግብይት ያክሉ",
+            recentTransactions: "የቅርብ ግብይቶች",
+            noTransactions: "እስካሁን ግብይት የለም",
+            addFirst: "ከላይ የመጀመሪያዎን ግብይት ያክሉ",
+            thisMonth: "በዚህ ወር"
+        }
+    };
+
+    let currentLang = localStorage.getItem('language') || 'en';
+
+    function changeLanguage() {
+        currentLang = document.getElementById('languageSelect').value;
+        localStorage.setItem('language', currentLang);
+        updateLanguage();
+    }
+
+    function updateLanguage() {
+        const t = translations[currentLang];
+        document.querySelector('.header h1').textContent = t.appTitle;
+        document.querySelector('.header p').textContent = t.subtitle;
+        document.querySelector('.balance-label').textContent = t.currentBalance;
+        document.querySelectorAll('.stat-label')[0].textContent = t.income;
+        document.querySelectorAll('.stat-label')[1].textContent = t.expenses;
+        document.querySelector('.add-transaction h3').textContent = t.addTransaction;
+        document.querySelector('.transactions-section h3').textContent = t.recentTransactions;
+        document.querySelector('.quick-stats h3').textContent = t.thisMonth;
+        if (transactions.length === 0) {
+            document.querySelector('.empty-state p:first-child').textContent = t.noTransactions;
+            document.querySelector('.empty-state p.small').textContent = t.addFirst;
+        }
+    }
+
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+    }
+
+    // Load saved preferences
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+    }
+    document.getElementById('languageSelect').value = currentLang;
+    updateLanguage();
+
+    // Your original JS functions (updateUI, form submit, delete, export, share, showSection, etc.)
+    // All working with new features
+
+    // Example updateUI with date formatting
+    function updateUI() {
+        const income = transactions.filter(t => t.type === 'income').reduce((a,b)=> a + b.amount,0);
+        const expense = transactions.filter(t => t.type === 'expense').reduce((a,b)=> a + b.amount,0);
+        document.getElementById('currentBalance').textContent = currentCurrency + (income - expense).toFixed(2);
+        document.getElementById('totalIncome').textContent = currentCurrency + income.toFixed(2);
+        document.getElementById('totalExpenses').textContent = currentCurrency + expense.toFixed(2);
+        document.getElementById('monthIncome').textContent = currentCurrency + income.toFixed(2);
+        document.getElementById('monthExpenses').textContent = currentCurrency + expense.toFixed(2);
+
+        const list = document.getElementById('transactionsList');
+        if (transactions.length === 0) {
+            list.innerHTML = `<div class="empty-state"><i class="fas fa-receipt"></i><p>${translations[currentLang].noTransactions}</p><p class="small">${translations[currentLang].addFirst}</p></div>`;
+        } else {
+            list.innerHTML = '';
+            [...transactions].reverse().forEach((t, i) => {
+                const idx = transactions.length - 1 - i;
+                const div = document.createElement('div');
+                div.className = `transaction-item ${t.type}`;
+                const dateStr = t.date ? new Date(t.date).toLocaleDateString() : 'Today';
+                div.innerHTML = `
+                    <div class="transaction-info">
+                        <span class="transaction-description">${t.description}</span>
+                        <span class="transaction-meta">${t.category} • ${dateStr}</span>
+                    </div>
+                    <div class="transaction-amount ${t.type}">${currentCurrency}${t.amount.toFixed(2)}</div>
+                    <button class="delete-btn" onclick="deleteTransaction(${idx})"><i class="fas fa-trash"></i></button>
+                `;
+                list.appendChild(div);
+            });
+        }
+        localStorage.setItem('transactions', JSON.stringify(transactions));
+    }
+
+    // Your original form submit, delete, export, share, showSection, etc. remain
+    // All functions updated to work with new features
+
+    updateUI();
+</script>
+<script>
+document.getElementById('transactionForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const description = document.getElementById('description').value;
+    const amount = parseFloat(document.getElementById('amount').value);
+    const date = document.getElementById('date').value;
+    const type = document.getElementById('type').value;
+    const category = document.getElementById('category').value;
+
+    if (!description || !amount || !type) return;
+
+    transactions.push({
+        description,
+        amount,
+        date,
+        type,
+        category
+    });
+
+    this.reset();
+    document.getElementById('date').value = new Date().toISOString().split('T')[0];
+
+    updateUI();
+});
+function deleteTransaction(index) {
+    transactions.splice(index, 1);
+    updateUI();
+}
+function showSection(section) {
+    document.getElementById('app-section').style.display = 'none';
+    document.getElementById('privacy-section').style.display = 'none';
+    document.getElementById('support-section').style.display = 'none';
+    document.getElementById('about-section').style.display = 'none';
+
+    document.getElementById(section + '-section').style.display = 'block';
+
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+}
+ function exportExcel(){
+        const ws_data = [['Description','Amount','Type','Category']];
+        transactions.forEach(t=> ws_data.push([t.description, t.amount, t.type, t.category]));
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(ws_data);
+        XLSX.utils.book_append_sheet(wb, ws, "Transactions");
+        XLSX.writeFile(wb, "transactions.xlsx");
+    }
+
+    function exportPDF(){
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(16);
+        doc.text("Expense Tracker Transactions", 20, 20);
+        let y = 30;
+        transactions.forEach(t=>{
+            doc.setFontSize(12);
+            doc.text(`${t.description} | ${t.amount.toFixed(2)} | ${t.type} | ${t.category}`, 20, y);
+            y += 10;
+        });
+        doc.save("transactions.pdf");
+    }
+    const appLink = "https://github.com/bereketgetu77-del"
+    function shareSocial(platform){
+        const url = encodeURIComponent(`Check out my transaction on Expense Tracker ${appLink} !`);
+        if(platform==='telegram'){
+            window.open(`https://t.me/share/url?url=${url}`,'_blank');
+        } else if(platform==='whatsapp'){
+            window.open(`https://api.whatsapp.com/send?text=${url}`,'_blank');
+        } else if(platform==='twitter'){
+            window.open(`https://twitter.com/intent/tweet?text=${url}`,'_blank');
+        }
+    }
+
+    function sendFeedback(){
+        window.location.href = "mailto:bereketgetu77@gmail.com?subject=Expense Tracker Feedback";
+    }
+    updateUI();
+</script>
+
+</body>
+</html>
